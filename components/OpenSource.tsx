@@ -1,6 +1,7 @@
 import { ArrowUpRight, GitBranch } from 'lucide-react'
 import { Section } from './Section'
 import { SectionHeader } from './SectionHeader'
+import { Stagger, StaggerItem } from './animations/ScrollReveal'
 import { portfolio } from '@/data/portfolioData'
 
 export function OpenSource() {
@@ -15,9 +16,13 @@ export function OpenSource() {
         description="Code I keep in the open — mostly small tools and learning experiments."
       />
 
-      <ul className="mt-10 divide-y divide-border overflow-hidden rounded-lg border border-border">
+      <Stagger
+        as="ul"
+        className="mt-10 divide-y divide-border overflow-hidden rounded-lg border border-border"
+        stagger={0.07}
+      >
         {openSource.map((repo) => (
-          <li key={repo.name}>
+          <StaggerItem as="li" key={repo.name}>
             <a
               href={repo.href}
               className="group flex items-center justify-between gap-4 bg-surface/40 px-6 py-5 transition-colors hover:bg-surface"
@@ -37,12 +42,12 @@ export function OpenSource() {
               </div>
               <div className="flex shrink-0 items-center gap-4">
                 <span className="label-mono hidden sm:inline">{repo.language}</span>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-accent" />
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
               </div>
             </a>
-          </li>
+          </StaggerItem>
         ))}
-      </ul>
+      </Stagger>
     </Section>
   )
 }
