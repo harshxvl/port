@@ -1,0 +1,168 @@
+'use client'
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Search, CornerDownLeft } from 'lucide-react'
+import { portfolio } from '@/data/portfolioData'
+import { cn } from '@/lib/utils'
+
+/**
+ * Minimal ⌘K / Ctrl+K command palette for jumping between sections.
+ * Foundation: section navigation + social links. Extend actions later.
+ */
+export function CommandPalette() {
+  const { nav, socials } = portfolio
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [activeIndex, setActiveIndex] = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const items = useMemo(() => {
+    const sectionItems = nav.map((item) => ({
+      id: item.id,
+      label: item.label,
+      hint: `Section ${item.index}`,
+      href: item.href,
+      external: false,
+    }))
+    const socialItems = socials.map((social) => ({
+      id: social.platform,
+      label: social.label,
+      hint: social.handle ?? 'Link',
+      href: social.href,
+      external: social.href.startsWith('http'),
+    }))
+    return [...sectionItems, ...socialItems]
+  }, [nav, socials])
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return items
+    return items.filter((item) => item.label.toLowerCase().includes(q))
+  }, [items, query])
+
+  const close = useCallback(() => {
+    setOpen(false)
+    setQuery('')
+    setActiveIndex(0)
+  }, [])
+
+  const runItem = useCallback(
+    (item: (typeof items)[number]) => {
+      close()
+      if (item.external) {
+        window.open(item.href, '_blank', 'noreferrer')
+      } else {
+        window.location.hash = item.href
+      }
+    },
+    [close],
+  )
+
+  // Global ⌘K / Ctrl+K toggle.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setOpen((v) => !v)
+      }
+      if (e.key === 'Escape') close()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [close])
+
+  // Focus input + lock scroll when open.
+  useEffect(() => {
+    if (!open) return
+    const { overflow } = document.body.style
+    document.body.style.overflow = 'hidden'
+    inputRef.current?.focus()
+    return () => {
+      document.body.style.overflow = overflow
+    }
+  }, [open])
+
+  useEffect(() => {
+    setActiveIndex(0)
+  }, [query])
+
+  if (!open) return null
+
+  const onListKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.min(i + 1, results.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIndex((i) => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      const item = results[activeIndex]
+      if (item) runItem(item)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-[15vh]">
+      <div
+        className="absolute inset-0 bg-background/70 backdrop-blur-sm"
+        onClick={close}
+        aria-hidden="true"
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
+        className="animate-reveal relative w-full max-w-lg overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl"
+        onKeyDown={onListKeyDown}
+      >
+        <div className="flex items-center gap-3 border-b border-border px-4">
+          <Search className="h-4 w-4 text-subtle" aria-hidden="true" />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Jump to a section…"
+            className="w-full bg-transparent py-4 text-sm text-foreground placeholder:text-subtle focus:outline-none"
+            aria-label="Search sections"
+          />
+          <kbd className="label-mono rounded border border-border px-1.5 py-0.5">
+            esc
+          </kbd>
+        </div>
+
+        <ul className="max-h-72 overflow-y-auto p-2">
+          {results.length === 0 ? (
+            <li className="px-3 py-6 text-center text-sm text-muted-foreground">
+              No matches
+            </li>
+          ) : (
+            results.map((item, i) => (
+              <li key={`${item.id}-${item.label}`}>
+                <button
+                  type="button"
+                  onClick={() => runItem(item)}
+                  onMouseMove={() => setActiveIndex(i)}
+                  className={cn(
+                    'flex w-full items-center justify-between gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors',
+                    i === activeIndex
+                      ? 'bg-accent-muted text-foreground'
+                      : 'text-muted-foreground',
+                  )}
+                >
+                  <span className="text-foreground/90">{item.label}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="label-mono">{item.hint}</span>
+                    {i === activeIndex ? (
+                      <CornerDownLeft className="h-3.5 w-3.5 text-accent" />
+                    ) : null}
+                  </span>
+                </button>
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
+    </div>
+  )
+}
