@@ -12,13 +12,12 @@ export const portfolio: PortfolioData = {
     role: 'Python & Systems Developer',
     tagline:
       'Building Python tooling, AI assistants and low-latency systems from first principles.',
-    location: 'Gurugram, India',
+    location: 'Delhi, India',
     institution: 'DPG Degree College, Gurugram',
     degree: 'Bachelor of Computer Applications (BCA)',
-    year: '1st Year',
     availability: 'Open for Internships & Collaborations',
     bio: [
-      'I am a first-year BCA student teaching myself the layers beneath the applications most people use — from Python automation down to C and systems programming.',
+      'I am a BCA student teaching myself the layers beneath the applications most people use — from Python automation down to C and systems programming.',
       'My current work orbits AI/ML fundamentals, audio and voice systems, and low-latency API architecture. I like understanding how things actually run, not just how to call them.',
     ],
   },
