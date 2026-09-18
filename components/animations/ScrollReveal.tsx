@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { easeOut } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
-type Tag = 'div' | 'section' | 'li' | 'span' | 'ul' | 'p'
+type Tag = 'div' | 'section' | 'li' | 'span' | 'ul' | 'p' | 'dl'
 
 interface ScrollRevealProps {
   children: React.ReactNode

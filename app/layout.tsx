@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SmoothScrollProvider } from '@/components/animations/SmoothScrollProvider'
+import { ScrollProgress } from '@/components/animations/ScrollProgress'
+import { CursorFollower } from '@/components/animations/CursorFollower'
 import './globals.css'
 
 const inter = Inter({
@@ -86,7 +89,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body>
-        {children}
+        <SmoothScrollProvider>
+          <ScrollProgress />
+          {children}
+        </SmoothScrollProvider>
+        <CursorFollower />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

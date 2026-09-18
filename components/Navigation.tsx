@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { portfolio } from '@/data/portfolioData'
+import { getLenis } from '@/lib/smoothScroll'
 import { StatusIndicator } from './StatusIndicator'
 
 export function Navigation() {
@@ -46,8 +47,10 @@ export function Navigation() {
   // Lock background scroll + Escape-to-close while the drawer is open.
   useEffect(() => {
     if (!open) return
+    const lenis = getLenis()
     const { overflow } = document.body.style
     document.body.style.overflow = 'hidden'
+    lenis?.stop()
     closeButtonRef.current?.focus()
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -56,6 +59,7 @@ export function Navigation() {
     window.addEventListener('keydown', onKeyDown)
     return () => {
       document.body.style.overflow = overflow
+      lenis?.start()
       window.removeEventListener('keydown', onKeyDown)
     }
   }, [open])

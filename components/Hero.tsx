@@ -1,6 +1,12 @@
+'use client'
+
+import { useRef } from 'react'
 import { ArrowUpRight, ArrowDown } from 'lucide-react'
+import { useGSAP } from '@gsap/react'
+import { gsap, registerGSAP, prefersReducedMotion, GSAP_EASE } from '@/lib/animations'
 import { portfolio } from '@/data/portfolioData'
 import { TerminalWidget, type TerminalLine } from './TerminalWidget'
+import { MagneticButton } from './animations/MagneticButton'
 
 const terminalLines: TerminalLine[] = [
   { type: 'comment', text: 'current focus' },
@@ -13,10 +19,37 @@ const terminalLines: TerminalLine[] = [
 
 export function Hero() {
   const { profile } = portfolio
+  const root = useRef<HTMLDivElement>(null)
+
+  // Short, premium boot sequence: eyebrow → heading → role → description →
+  // meta → buttons, then the terminal lines type in progressively.
+  useGSAP(
+    () => {
+      if (prefersReducedMotion()) return
+      registerGSAP()
+      const tl = gsap.timeline({ defaults: { ease: GSAP_EASE.expo } })
+      tl.from('[data-hero-reveal]', {
+        y: 18,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.09,
+      })
+      const lines = root.current?.querySelectorAll('[data-hero-terminal] p')
+      if (lines?.length) {
+        tl.from(
+          lines,
+          { opacity: 0, y: 6, duration: 0.26, stagger: 0.11, ease: 'power2.out' },
+          '-=0.15',
+        )
+      }
+    },
+    { scope: root },
+  )
 
   return (
     <div
       id="top"
+      ref={root}
       className="relative overflow-hidden border-b border-border pt-16"
     >
       {/* Restrained grid texture, faded near the top only. */}
@@ -28,26 +61,32 @@ export function Hero() {
       <div className="relative mx-auto w-full max-w-[1200px] px-6 py-20 md:px-8 md:py-28">
         <div className="grid gap-14 lg:grid-cols-[1.35fr_1fr] lg:items-center lg:gap-12">
           {/* Left — editorial intro */}
-          <div className="animate-reveal">
-            <div className="flex items-center gap-3">
+          <div>
+            <div className="flex items-center gap-3" data-hero-reveal>
               <span className="label-mono text-accent">00</span>
               <span className="h-px w-6 bg-border-strong" aria-hidden="true" />
               <span className="label-mono">{profile.location}</span>
             </div>
 
-            <h1 className="mt-6 text-pretty text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+            <h1
+              className="mt-6 text-pretty text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl"
+              data-hero-reveal
+            >
               {profile.name}
             </h1>
 
-            <p className="mt-4 font-mono text-sm text-accent md:text-base">
+            <p className="mt-4 font-mono text-sm text-accent md:text-base" data-hero-reveal>
               {profile.role}
             </p>
 
-            <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
+            <p
+              className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground"
+              data-hero-reveal
+            >
               {profile.tagline}
             </p>
 
-            <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4">
+            <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4" data-hero-reveal>
               <div>
                 <dt className="label-mono">Institution</dt>
                 <dd className="mt-1 text-sm text-foreground/90">
@@ -62,25 +101,29 @@ export function Hero() {
               </div>
             </dl>
 
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <a
-                href="#projects"
-                className="group inline-flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-transform duration-200 hover:-translate-y-0.5"
-              >
-                View Projects
-                <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-border-strong"
-              >
-                Get in touch
-              </a>
+            <div className="mt-10 flex flex-wrap items-center gap-3" data-hero-reveal>
+              <MagneticButton>
+                <a
+                  href="#projects"
+                  className="group inline-flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 text-sm font-medium text-accent-foreground transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
+                >
+                  View Projects
+                  <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+              </MagneticButton>
+              <MagneticButton>
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-border-strong active:scale-[0.98]"
+                >
+                  Get in touch
+                </a>
+              </MagneticButton>
             </div>
           </div>
 
           {/* Right — terminal instrumentation */}
-          <div className="animate-reveal lg:pl-4" style={{ animationDelay: '80ms' }}>
+          <div className="lg:pl-4" data-hero-reveal data-hero-terminal>
             <TerminalWidget lines={terminalLines} />
           </div>
         </div>

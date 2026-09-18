@@ -1,6 +1,7 @@
 import { ArrowUpRight, GitBranch } from 'lucide-react'
 import { Section } from './Section'
 import { SectionHeader } from './SectionHeader'
+import { ScrollReveal, Stagger, StaggerItem } from './animations/ScrollReveal'
 import { portfolio } from '@/data/portfolioData'
 
 export function OpenSource() {
@@ -8,16 +9,21 @@ export function OpenSource() {
 
   return (
     <Section id="open-source">
-      <SectionHeader
-        index="05"
-        label="Open Source"
-        title="Public repositories"
-        description="Code I keep in the open — mostly small tools and learning experiments."
-      />
+      <ScrollReveal>
+        <SectionHeader
+          index="05"
+          label="Open Source"
+          title="Public repositories"
+          description="Code I keep in the open — mostly small tools and learning experiments."
+        />
+      </ScrollReveal>
 
-      <ul className="mt-10 divide-y divide-border overflow-hidden rounded-lg border border-border">
+      <Stagger
+        as="ul"
+        className="mt-10 divide-y divide-border overflow-hidden rounded-lg border border-border"
+      >
         {openSource.map((repo) => (
-          <li key={repo.name}>
+          <StaggerItem as="li" key={repo.name}>
             <a
               href={repo.href}
               className="group flex items-center justify-between gap-4 bg-surface/40 px-6 py-5 transition-colors hover:bg-surface"
@@ -37,12 +43,12 @@ export function OpenSource() {
               </div>
               <div className="flex shrink-0 items-center gap-4">
                 <span className="label-mono hidden sm:inline">{repo.language}</span>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-accent" />
+                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
               </div>
             </a>
-          </li>
+          </StaggerItem>
         ))}
-      </ul>
+      </Stagger>
     </Section>
   )
 }
