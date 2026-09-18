@@ -143,8 +143,15 @@ export const portfolio: PortfolioData = {
       id: 'bca',
       institution: 'DPG Degree College, Gurugram',
       credential: 'Bachelor of Computer Applications (BCA)',
-      period: '2024 — 2027',
-      detail: '1st Year · Computer Applications',
+      period: '2026 — 2029',
+      detail: 'Computer Applications',
+    },
+    {
+      id: 'Schooling',
+      institution: 'The Shri Ram School Moulsari',
+      credential: 'ISC',
+      period: '2024-2025',
+      detail: 'Commerce with Maths',
     },
   ],
 
